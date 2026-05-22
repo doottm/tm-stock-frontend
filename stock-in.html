@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>입고 등록 - 스마트 재고관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <div class="w-full max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:h-[800px] sm:mt-10 sm:rounded-3xl sm:shadow-xl flex flex-col overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="bg-blue-600 text-white p-4 flex items-center shadow-md relative z-10 shrink-0">
+            <a href="index.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-700/50 hover:bg-blue-800 text-white mr-3 active:scale-95 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </a>
+            <h1 class="text-xl font-bold flex-1">📥 입고 등록</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-5 overflow-y-auto">
+            <form id="stockInForm" class="space-y-6">
+                <!-- Date -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700">입고 일자 및 시간</label>
+                    <input type="datetime-local" id="inDate" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-sm font-semibold" required>
+                </div>
+
+                <!-- Worker -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700">담당자</label>
+                    <select id="worker" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-sm font-semibold" required>
+                        <option value="">선택하세요</option>
+                        <option value="사장님">사장님</option>
+                        <option value="주방장">주방장</option>
+                        <option value="직원1">직원1</option>
+                        <option value="직원2">직원2</option>
+                    </select>
+                </div>
+
+                <!-- Product Selection -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700">품목 선택</label>
+                    <!-- Search input to act as a filter -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <input type="text" id="productSearch" class="bg-white border border-slate-300 text-slate-900 text-base rounded-t-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-3 shadow-sm" placeholder="품목명 검색...">
+                    </div>
+                    <select id="productSelect" class="w-full bg-slate-50 border border-t-0 border-slate-300 text-slate-900 text-lg rounded-b-xl focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-sm font-semibold" size="5" required>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Quantity -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700">입고 수량 <span id="unitText" class="text-blue-600 font-bold ml-1"></span></label>
+                    <div class="flex items-center space-x-3">
+                        <button type="button" id="btnMinus" class="w-14 h-14 bg-slate-200 hover:bg-slate-300 rounded-2xl flex items-center justify-center text-2xl font-bold text-slate-700 active:scale-95 transition-transform shadow-sm">-</button>
+                        <input type="number" id="quantity" class="flex-1 bg-white border border-slate-300 text-slate-900 text-3xl text-center rounded-2xl focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-sm font-bold" value="1" min="1" required>
+                        <button type="button" id="btnPlus" class="w-14 h-14 bg-blue-100 hover:bg-blue-200 rounded-2xl flex items-center justify-center text-2xl font-bold text-blue-700 active:scale-95 transition-transform shadow-sm">+</button>
+                    </div>
+                </div>
+            </form>
+            <div class="h-24"></div> <!-- Padding for sticky button -->
+        </main>
+
+        <!-- Sticky Bottom Button -->
+        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/90 backdrop-blur-md border-t border-slate-100 pb-8 sm:pb-4">
+            <button type="submit" form="stockInForm" class="btn-press w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl px-5 py-4 shadow-lg shadow-blue-600/30">
+                입고 등록하기
+            </button>
+        </div>
+
+        <!-- Overlay Loading -->
+        <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+            <p class="text-lg font-bold text-slate-800">처리 중입니다...</p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/stock-in.js"></script>
+</body>
+</html>

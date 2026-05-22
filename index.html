@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>스마트 재고관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[600px] sm:min-h-0 sm:h-[800px]">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white p-6 text-center shadow-md relative z-10">
+            <div class="absolute top-4 right-4 flex flex-col items-end">
+                <span id="userNameDisplay" class="text-xs font-bold bg-blue-700/50 px-2 py-1 rounded mb-1">로딩중</span>
+                <button id="logoutBtn" class="text-[10px] underline text-blue-200 hover:text-white">로그아웃</button>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">트래블메이커<br>재고관리</h1>
+            <p class="text-blue-100 text-sm mt-2 font-medium">TM가족 화이팅!!!!</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 flex flex-col justify-center space-y-6">
+            <!-- [수정사항: 2026-05-19] 2. 입고메뉴 삭제 및 품목 추가 메뉴로 교체 -->
+            <a href="product-add.html" class="btn-press flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-2xl p-6 shadow-sm group">
+                <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
+                    ➕
+                </div>
+                <h2 class="text-xl font-bold text-blue-900 mb-1">새 품목 추가</h2>
+                <p class="text-sm text-blue-600 font-medium">품목명, 최소재고, 위치 설정</p>
+            </a>
+
+            <!-- Button 2: Inventory Check -->
+            <a href="inventory-check.html" class="btn-press flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-200 rounded-2xl p-6 shadow-sm group">
+                <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
+                    📋
+                </div>
+                <h2 class="text-xl font-bold text-emerald-900 mb-1">현재고 확인</h2>
+                <p class="text-sm text-emerald-600 font-medium">눈에 보이는 실제 재고량 입력</p>
+            </a>
+
+            <!-- Button 3: Auto Order List -->
+            <a href="order-list.html" class="btn-press flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 rounded-2xl p-6 shadow-sm group">
+                <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-3xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
+                    🛒
+                </div>
+                <h2 class="text-xl font-bold text-purple-900 mb-1">발주 리스트</h2>
+                <p class="text-sm text-purple-600 font-medium">자동 계산된 필요 발주량 확인</p>
+            </a>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="text-center p-4 text-xs text-slate-400 border-t border-slate-100">
+            Powered by Antigravity
+        </footer>
+    </div>
+    <script src="js/index.js"></script>
+</body>
+</html>

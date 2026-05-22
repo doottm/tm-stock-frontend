@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>발주 리스트 - 스마트 재고관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <div class="w-full max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:h-[800px] sm:mt-10 sm:rounded-3xl sm:shadow-xl flex flex-col overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="bg-purple-600 text-white p-4 shadow-md relative z-10 shrink-0">
+            <div class="flex items-center">
+                <a href="index.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-purple-700/50 hover:bg-purple-800 text-white mr-3 active:scale-95 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </a>
+                <h1 class="text-xl font-bold flex-1">🛒 자동 발주 리스트</h1>
+                <button id="btnRefresh" class="w-10 h-10 flex items-center justify-center rounded-full bg-purple-700/50 hover:bg-purple-800 text-white active:scale-95 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </button>
+            </div>
+            <p class="text-purple-200 text-xs mt-2 font-medium">안전재고에 미달된 품목만 표시됩니다.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-slate-50 p-4" id="orderListContainer">
+            <!-- Skeletons -->
+            <div class="animate-pulse space-y-6">
+                <div>
+                    <div class="h-6 w-32 bg-slate-200 rounded mb-3"></div>
+                    <div class="h-20 bg-slate-200 rounded-2xl"></div>
+                </div>
+                <div>
+                    <div class="h-6 w-32 bg-slate-200 rounded mb-3"></div>
+                    <div class="h-20 bg-slate-200 rounded-2xl mb-2"></div>
+                    <div class="h-20 bg-slate-200 rounded-2xl"></div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Summary Footer -->
+        <div class="bg-white border-t border-slate-200 p-4 pb-8 sm:pb-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-bold text-slate-500">발주 필요 총 품목 수</span>
+                <span class="text-2xl font-black text-purple-700" id="totalItemsCount">0개</span>
+            </div>
+            <button class="btn-press w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-lg rounded-xl px-4 py-3 flex justify-center items-center">
+                발주서 다운로드 / 공유하기
+            </button>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/order-list.js"></script>
+</body>
+</html>

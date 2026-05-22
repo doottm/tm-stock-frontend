@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- [수정사항 2026-05-19] 1. 헤더 초압축, 2. 카드 초압축 (12개 노출 목표), 3. 버튼 텍스트 변경 -->
+    <title>현재고 확인 - 스마트 재고관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <div class="w-full max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:h-[800px] sm:mt-10 sm:rounded-3xl sm:shadow-xl flex flex-col overflow-hidden relative">
+        
+        <!-- Header (초압축) -->
+        <header class="bg-emerald-600 text-white px-2 py-2 shadow-md relative z-10 shrink-0 space-y-1.5">
+            <!-- Row 1: Back, Title, Worker -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="index.html" class="w-7 h-7 flex items-center justify-center rounded-full bg-emerald-700/50 hover:bg-emerald-800 text-white mr-1.5 active:scale-95 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    </a>
+                    <h1 class="text-sm font-bold">📋 현재고 실사</h1>
+                <div class="bg-emerald-700/50 text-emerald-100 text-[10px] rounded p-1 px-2 font-bold flex items-center">
+                    👤 <span id="workerNameDisplay" class="ml-1 text-white text-xs">로딩중</span>
+                </div>
+            </div>
+            
+            <!-- Row 2: Date, Location, Supplier -->
+            <div class="grid grid-cols-3 gap-1">
+                <select id="locationFilter" class="bg-emerald-700 border-none text-white text-xs rounded p-1 appearance-none truncate w-full text-center">
+                    <option value="ALL">위치: 전체</option>
+                </select>
+                <select id="supplierFilter" class="bg-emerald-700 border-none text-white text-xs rounded p-1 appearance-none truncate w-full text-center">
+                    <option value="ALL">거래처: 전체</option>
+                </select>
+                <button id="btnSave" class="btn-press bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded p-1 flex justify-center items-center h-full">
+                    업데이트 <span id="changeCountBadge" class="ml-1 bg-white text-emerald-800 text-[9px] py-0.5 px-1.5 rounded-full font-bold hidden">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-slate-50">
+            <!-- [수정사항] 간격 극단적 축소 (p-1 gap-1.5) -->
+            <div class="p-1.5 grid grid-cols-2 gap-1.5" id="productList">
+                <div class="animate-pulse space-y-2">
+                    <div class="h-20 bg-slate-200 rounded-lg"></div>
+                </div>
+                <div class="animate-pulse space-y-2">
+                    <div class="h-20 bg-slate-200 rounded-lg"></div>
+                </div>
+            </div>
+            <div class="h-16"></div> <!-- Padding for sticky button -->
+        </main>
+
+        <!-- Sticky Bottom Button Removed -->
+
+        <!-- Overlay Loading -->
+        <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-emerald-600 mb-2"></div>
+            <p class="text-sm font-bold text-slate-800">업데이트 중입니다...</p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/inventory-check.js"></script>
+</body>
+</html>

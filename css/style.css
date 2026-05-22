@@ -1,0 +1,25 @@
+body {
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Custom Scrollbar for mobile/web */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.btn-press {
+    transition: transform 0.1s ease-in-out;
+}
+.btn-press:active {
+    transform: scale(0.96);
+}
