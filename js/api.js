@@ -1,6 +1,8 @@
 // [수정사항: 2026-05-19] 품목 추가(POST /api/products) API 연동 추가
 const CONFIG = {
-    API_BASE_URL: 'https://tm-stock-server.onrender.com',
+    API_BASE_URL: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+        ? 'http://localhost:3000'
+        : 'https://tm-stock-server.onrender.com',
     USE_MOCK: false
 };
 
