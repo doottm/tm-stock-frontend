@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supplierFilter = document.getElementById('supplierFilter'); 
     const btnSave = document.getElementById('btnSave');
     const changeCountBadge = document.getElementById('changeCountBadge');
+    const btnSaveBottom = document.getElementById('btnSaveBottom');
+    const changeCountBadgeBottom = document.getElementById('changeCountBadgeBottom');
     const loadingOverlay = document.getElementById('loadingOverlay');
     // [수정사항 2026-05-20] checkDate 삭제
     let allProducts = [];
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <span class="truncate">${p.supplier || ''}</span>
                         </div>
                         <h3 class="font-bold text-base text-slate-800 leading-tight line-clamp-2 mb-0.5">${p.item_name}</h3>
-                        <div class="font-bold text-[10px] text-red-500">${lastUpdatedText}</div>
+                        <div class="font-bold text-sm text-red-500">${lastUpdatedText}</div>
                     </div>
                     <div class="flex flex-col items-end shrink-0">
                         <div class="font-bold text-[10px] text-blue-500 mb-0.5 h-3.5 flex items-center">${lastWorkerText}</div>
@@ -129,15 +131,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (count > 0) {
             changeCountBadge.textContent = `${count}건`;
             changeCountBadge.classList.remove('hidden');
+            if(changeCountBadgeBottom) {
+                changeCountBadgeBottom.textContent = `${count}건`;
+                changeCountBadgeBottom.classList.remove('hidden');
+            }
         } else {
             changeCountBadge.classList.add('hidden');
+            if(changeCountBadgeBottom) changeCountBadgeBottom.classList.add('hidden');
         }
     };
 
     locationFilter.addEventListener('change', renderList);
     supplierFilter.addEventListener('change', renderList);
 
-    btnSave.addEventListener('click', async () => {
+    const saveHandler = async () => {
         const modKeys = Object.keys(modifications);
         if (modKeys.length === 0) {
             alert('변경된 수량이 없습니다.');
@@ -198,7 +205,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         } finally {
             loadingOverlay.classList.add('hidden');
         }
-    });
+    };
+
+    btnSave.addEventListener('click', saveHandler);
+    if(btnSaveBottom) btnSaveBottom.addEventListener('click', saveHandler);
 
     renderList();
 });

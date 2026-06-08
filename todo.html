@@ -27,27 +27,39 @@
     <div class="w-full max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:h-[800px] sm:mt-10 sm:rounded-3xl sm:shadow-xl flex flex-col overflow-hidden relative">
         
         <!-- Header -->
-        <header class="bg-amber-500 text-white p-4 shadow-md relative z-10 shrink-0">
+        <header class="bg-amber-500 text-white p-4 shadow-md relative z-10 shrink-0" id="mainHeader">
             <div class="flex items-center">
                 <a href="index.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-amber-600/50 hover:bg-amber-700 text-white mr-3 active:scale-95 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                 </a>
-                <h1 class="text-xl font-bold flex-1 flex items-center gap-2">
+                <h1 class="text-xl font-bold flex-1 flex items-center gap-2" id="pageTitle">
                     📝 해주세요
                 </h1>
-                <div class="text-xs bg-amber-600/60 px-2.5 py-1.5 rounded-full font-bold shadow-inner" id="progressBadge">
-                    0/0 완료
+                <div class="flex gap-1 items-center">
+                    <div class="text-[10px] sm:text-xs bg-amber-600/60 px-2 py-1.5 rounded-full font-bold shadow-inner" id="progressBadge">
+                        0/0 완료
+                    </div>
+                    <button id="btnTrashToggle" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1.5 rounded-lg font-bold transition-all flex items-center text-white">
+                        🗑️ 휴지통
+                    </button>
                 </div>
             </div>
-            <p class="text-amber-100 text-xs mt-2 font-medium">매장에 필요한 요청사항이나 주문필요사항 남겨주세요.</p>
+            <p class="text-amber-100 text-xs mt-2 font-medium" id="pageDesc">매장에 필요한 요청사항이나 주문필요사항 남겨주세요.</p>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-slate-50/60 p-4 flex flex-col">
+        <main class="flex-1 overflow-y-auto bg-slate-50/60 p-4 flex flex-col relative">
+            
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center hidden backdrop-blur-sm">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-amber-500 mb-2"></div>
+                <p class="text-xs font-bold text-slate-600">동기화 중...</p>
+            </div>
+
             <!-- Input Form Card -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4 shrink-0">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4 shrink-0" id="formContainer">
                 <form id="todoForm" class="space-y-3">
                     <div class="flex gap-2">
                         <input type="text" id="todoInput" placeholder="요청사항을 입력하세요... (예: 컵 홀더 채워주세요)" 
@@ -57,17 +69,17 @@
                         </button>
                     </div>
                     <!-- priority selector -->
-                    <div class="flex gap-2 items-center text-xs">
-                        <span class="text-slate-400 font-medium">우선순위:</span>
-                        <label class="flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 checked-sibling:bg-rose-50 hover:bg-slate-200 transition-all font-semibold" id="label-high">
+                    <div class="flex gap-2 items-center text-xs overflow-x-auto whitespace-nowrap pb-1">
+                        <span class="text-slate-400 font-medium shrink-0">우선순위:</span>
+                        <label class="flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 checked-sibling:bg-rose-50 hover:bg-slate-200 transition-all font-semibold shrink-0" id="label-high">
                             <input type="radio" name="priority" value="high" class="sr-only">
                             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>긴급
                         </label>
-                        <label class="flex items-center gap-1 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border-2 border-amber-400 font-semibold transition-all text-amber-900" id="label-normal">
+                        <label class="flex items-center gap-1 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border-2 border-amber-400 font-semibold transition-all text-amber-900 shrink-0" id="label-normal">
                             <input type="radio" name="priority" value="normal" class="sr-only" checked>
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>주문
                         </label>
-                        <label class="flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold" id="label-low">
+                        <label class="flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold shrink-0" id="label-low">
                             <input type="radio" name="priority" value="low" class="sr-only">
                             <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>기타
                         </label>
@@ -79,9 +91,9 @@
             <div class="flex-1 flex flex-col justify-start">
                 <!-- Empty State -->
                 <div id="emptyState" class="hidden flex-1 flex-col items-center justify-center py-12 text-center">
-                    <span class="text-5xl mb-3">🎉</span>
-                    <h3 class="text-base font-bold text-slate-700 mb-1">모든 요청이 처리되었습니다!</h3>
-                    <p class="text-xs text-slate-400 font-medium">새로운 요청사항을 남겨주세요.</p>
+                    <span class="text-5xl mb-3" id="emptyIcon">🎉</span>
+                    <h3 class="text-base font-bold text-slate-700 mb-1" id="emptyTitle">모든 요청이 처리되었습니다!</h3>
+                    <p class="text-xs text-slate-400 font-medium" id="emptyDesc">새로운 요청사항을 남겨주세요.</p>
                 </div>
 
                 <!-- Todo List -->
@@ -92,13 +104,10 @@
         </main>
         
         <!-- Summary Footer / Quick Cleanup -->
-        <footer class="bg-white border-t border-slate-200 p-4 pb-8 sm:pb-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0">
+        <footer class="bg-white border-t border-slate-200 p-4 pb-8 sm:pb-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0" id="footerContainer">
             <div class="flex justify-between items-center gap-4">
                 <button id="btnClearCompleted" class="btn-press flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm py-3 rounded-xl transition-all">
-                    완료 항목 일괄 삭제
-                </button>
-                <button id="btnResetAll" class="btn-press flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-sm py-3 rounded-xl transition-all">
-                    전체 초기화
+                    완료 항목 지우기
                 </button>
             </div>
         </footer>
@@ -110,12 +119,10 @@
             ? 'http://localhost:3000'
             : 'https://tm-stock-server.onrender.com';
 
-        // Storage Keys
-        const STORAGE_KEY = 'tm_stock_todos';
-
         // State
-        let todos = [];
+        let allTodos = [];
         let currentUser = '관리자';
+        let isTrashView = false;
 
         // DOM Elements
         const todoForm = document.getElementById('todoForm');
@@ -124,7 +131,17 @@
         const emptyState = document.getElementById('emptyState');
         const progressBadge = document.getElementById('progressBadge');
         const btnClearCompleted = document.getElementById('btnClearCompleted');
-        const btnResetAll = document.getElementById('btnResetAll');
+        const btnTrashToggle = document.getElementById('btnTrashToggle');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        const mainHeader = document.getElementById('mainHeader');
+        const pageTitle = document.getElementById('pageTitle');
+        const pageDesc = document.getElementById('pageDesc');
+        const formContainer = document.getElementById('formContainer');
+        const footerContainer = document.getElementById('footerContainer');
+        const emptyIcon = document.getElementById('emptyIcon');
+        const emptyTitle = document.getElementById('emptyTitle');
+        const emptyDesc = document.getElementById('emptyDesc');
 
         // Priority Styles mapping
         const priorityBadgeMap = {
@@ -134,65 +151,62 @@
         };
 
         // Initialize
-        function init() {
-            // Load current user
+        async function init() {
             const userName = localStorage.getItem('user_name');
             if (userName) {
                 currentUser = userName;
-            }
-
-            // Load from LocalStorage
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    todos = JSON.parse(stored);
-                } catch(e) {
-                    todos = [];
-                }
             } else {
-                // Default items if first time
-                todos = [
-                    { id: 1, text: '오픈 시 상품 쇼케이스 진열 상태 점검', completed: false, priority: 'high', creator: '트래블메이커', createdAt: Date.now() - 3600000 * 2 },
-                    { id: 2, text: '마감 시 냉장실 온도 기록 필수', completed: true, priority: 'normal', creator: '매니저', createdAt: Date.now() - 3600000 * 5 }
-                ];
-                saveTodos();
+                window.location.replace('login.html');
+                return;
             }
 
             // Priority Radio Labels UI Interaction
             const radios = document.querySelectorAll('input[name="priority"]');
             radios.forEach(radio => {
                 radio.addEventListener('change', (e) => {
-                    // Reset all styles
-                    document.getElementById('label-high').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold';
-                    document.getElementById('label-normal').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold';
-                    document.getElementById('label-low').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold';
+                    document.getElementById('label-high').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold shrink-0';
+                    document.getElementById('label-normal').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold shrink-0';
+                    document.getElementById('label-low').className = 'flex items-center gap-1 cursor-pointer bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 transition-all font-semibold shrink-0';
 
-                    // Apply selected style
                     const selectedVal = e.target.value;
-                    const labelId = `label-${selectedVal}`;
-                    const targetLabel = document.getElementById(labelId);
+                    const targetLabel = document.getElementById(`label-${selectedVal}`);
                     if (selectedVal === 'high') {
-                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-rose-50 px-2.5 py-1.5 rounded-lg border-2 border-rose-400 font-semibold transition-all text-rose-900';
+                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-rose-50 px-2.5 py-1.5 rounded-lg border-2 border-rose-400 font-semibold transition-all text-rose-900 shrink-0';
                     } else if (selectedVal === 'normal') {
-                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border-2 border-amber-400 font-semibold transition-all text-amber-900';
+                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-amber-50 px-2.5 py-1.5 rounded-lg border-2 border-amber-400 font-semibold transition-all text-amber-900 shrink-0';
                     } else {
-                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-slate-200 px-2.5 py-1.5 rounded-lg border-2 border-slate-400 font-semibold transition-all text-slate-900';
+                        targetLabel.className = 'flex items-center gap-1 cursor-pointer bg-slate-200 px-2.5 py-1.5 rounded-lg border-2 border-slate-400 font-semibold transition-all text-slate-900 shrink-0';
                     }
                 });
             });
 
-            render();
+            await fetchTodos();
         }
 
-        // Save to LocalStorage
-        function saveTodos() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+        async function fetchTodos() {
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos`);
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+                allTodos = data;
+                render();
+            } catch (err) {
+                console.error(err);
+                alert('데이터를 불러오는데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
         }
 
-        // Date formatter (MM.DD HH:mm or '오늘 HH:mm')
+        function setLoading(isLoading) {
+            if (isLoading) loadingOverlay.classList.remove('hidden');
+            else loadingOverlay.classList.add('hidden');
+        }
+
         function formatDate(timestamp) {
             if (!timestamp) return '알 수 없음';
-            const date = new Date(timestamp);
+            const date = new Date(Number(timestamp));
             const now = new Date();
             
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -203,158 +217,264 @@
             if (date.toDateString() === now.toDateString()) {
                 return `오늘 ${hours}:${minutes}`;
             }
-            
             return `${month}.${day} ${hours}:${minutes}`;
         }
 
-        // Render Todo items
         function render() {
             todoList.innerHTML = '';
+            
+            // Filter by view
+            const displayTodos = allTodos.filter(t => isTrashView ? t.status === 'Trash' : t.status === 'Active');
 
-            if (todos.length === 0) {
+            if (displayTodos.length === 0) {
                 emptyState.classList.remove('hidden');
+                if (isTrashView) {
+                    emptyIcon.textContent = '🗑️';
+                    emptyTitle.textContent = '휴지통이 비어있습니다.';
+                    emptyDesc.textContent = '최근 30일 내에 삭제된 항목이 여기에 표시됩니다.';
+                } else {
+                    emptyIcon.textContent = '🎉';
+                    emptyTitle.textContent = '모든 요청이 처리되었습니다!';
+                    emptyDesc.textContent = '새로운 요청사항을 남겨주세요.';
+                }
             } else {
                 emptyState.classList.add('hidden');
 
-                // Sort: incomplete first, then by priority (high > normal > low), then latest first
-                const sortedTodos = [...todos].sort((a, b) => {
-                    if (a.completed !== b.completed) {
-                        return a.completed ? 1 : -1;
+                const sortedTodos = [...displayTodos].sort((a, b) => {
+                    if(isTrashView) {
+                        return b.deletedAt.localeCompare(a.deletedAt); // newest deleted first
+                    } else {
+                        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                        const priorityWeight = { high: 3, normal: 2, low: 1 };
+                        if (priorityWeight[a.priority] !== priorityWeight[b.priority]) {
+                            return priorityWeight[b.priority] - priorityWeight[a.priority];
+                        }
+                        return b.createdAt - a.createdAt;
                     }
-                    const priorityWeight = { high: 3, normal: 2, low: 1 };
-                    if (priorityWeight[a.priority] !== priorityWeight[b.priority]) {
-                        return priorityWeight[b.priority] - priorityWeight[a.priority];
-                    }
-                    return b.createdAt - a.createdAt;
                 });
 
                 sortedTodos.forEach(todo => {
                     const li = document.createElement('li');
-                    li.className = `todo-item flex items-center justify-between bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 ${todo.completed ? 'completed' : ''}`;
+                    li.className = `todo-item flex items-center justify-between bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 ${todo.completed && !isTrashView ? 'completed' : ''}`;
                     
-                    const badge = priorityBadgeMap[todo.priority];
+                    const badge = priorityBadgeMap[todo.priority] || priorityBadgeMap['low'];
                     const creatorName = todo.creator || '알 수 없음';
 
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                            <button onclick="toggleTodo(${todo.id})" class="shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${todo.completed ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-300 hover:border-amber-400 bg-white'}" aria-label="완료 체크박스">
+                    let actionsHtml = '';
+                    if (isTrashView) {
+                        actionsHtml = `
+                            <button onclick="restoreTodo('${todo.id}')" class="btn-press shrink-0 text-xs font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition-all border border-amber-200">
+                                복원
+                            </button>
+                        `;
+                    } else {
+                        actionsHtml = `
+                            <button onclick="toggleTodo('${todo.id}', ${todo.completed})" class="shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${todo.completed ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-300 hover:border-amber-400 bg-white'}" aria-label="완료 체크박스">
                                 ${todo.completed ? `
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                                         <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                                     </svg>
                                 ` : ''}
                             </button>
+                        `;
+                    }
+
+                    let deleteBtnHtml = '';
+                    if (!isTrashView) {
+                        deleteBtnHtml = `
+                            <button onclick="deleteTodo('${todo.id}')" class="btn-press shrink-0 w-8 h-8 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all" aria-label="삭제">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                            </button>
+                        `;
+                    }
+
+                    let dateString = isTrashView && todo.deletedAt 
+                        ? `삭제: ${new Date(todo.deletedAt).toLocaleDateString('ko-KR')}` 
+                        : `작성: ${formatDate(todo.createdAt)}`;
+
+                    li.innerHTML = `
+                        <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
+                            ${actionsHtml}
                             <div class="flex flex-col min-w-0 gap-1">
-                                <span class="todo-text text-sm font-semibold break-all leading-tight ${todo.completed ? 'text-slate-400' : 'text-slate-800'}">${escapeHtml(todo.text)}</span>
+                                <span class="todo-text text-sm font-semibold break-all leading-tight ${todo.completed && !isTrashView ? 'text-slate-400' : 'text-slate-800'}">${escapeHtml(todo.text)}</span>
                                 <div class="flex flex-wrap gap-1.5 items-center">
                                     <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ${badge.bg} ${badge.text}">
                                         <span class="w-1 h-1 rounded-full ${badge.dot}"></span>
                                         ${badge.label}
                                     </span>
-                                    <span class="text-[10px] text-slate-400 font-medium">by ${escapeHtml(creatorName)} • ${formatDate(todo.createdAt)}</span>
+                                    <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(creatorName)} • ${dateString}</span>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="deleteTodo(${todo.id})" class="btn-press shrink-0 w-8 h-8 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all" aria-label="삭제">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                            </svg>
-                        </button>
+                        ${deleteBtnHtml}
                     `;
                     todoList.appendChild(li);
                 });
             }
 
             // Update Badge
-            const completedCount = todos.filter(t => t.completed).length;
-            progressBadge.textContent = `${completedCount}/${todos.length} 완료`;
-            if (todos.length > 0 && completedCount === todos.length) {
-                progressBadge.className = 'text-xs bg-emerald-500 text-white px-2.5 py-1.5 rounded-full font-bold shadow-inner';
+            if (!isTrashView) {
+                const activeTodos = allTodos.filter(t => t.status === 'Active');
+                const completedCount = activeTodos.filter(t => t.completed).length;
+                progressBadge.textContent = `${completedCount}/${activeTodos.length} 완료`;
+                if (activeTodos.length > 0 && completedCount === activeTodos.length) {
+                    progressBadge.className = 'text-[10px] sm:text-xs bg-emerald-500 text-white px-2 py-1.5 rounded-full font-bold shadow-inner';
+                } else {
+                    progressBadge.className = 'text-[10px] sm:text-xs bg-amber-600/60 px-2 py-1.5 rounded-full font-bold shadow-inner text-white';
+                }
             } else {
-                progressBadge.className = 'text-xs bg-amber-600/60 px-2.5 py-1.5 rounded-full font-bold shadow-inner';
+                progressBadge.textContent = `휴지통 보기`;
+                progressBadge.className = 'text-[10px] sm:text-xs bg-slate-600 px-2 py-1.5 rounded-full font-bold shadow-inner text-white';
             }
         }
 
         // Add Todo
-        todoForm.addEventListener('submit', (e) => {
+        todoForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = todoInput.value.trim();
             if (!text) return;
 
             const priority = document.querySelector('input[name="priority"]:checked').value;
+            const newTodoId = String(Date.now());
+            const createdAt = Date.now();
             
-            const newTodo = {
-                id: Date.now(),
+            const payload = {
+                id: newTodoId,
                 text: text,
-                completed: false,
                 priority: priority,
                 creator: currentUser,
-                createdAt: Date.now()
+                createdAt: createdAt,
+                date: formatDate(createdAt)
             };
 
-            todos.push(newTodo);
-            saveTodos();
-            
-            // 텔레그램 알림 발송 (백엔드 API 호출)
-            fetch(`${API_BASE_URL}/api/notify-todo`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    text: text,
-                    priority: priority,
-                    creator: currentUser,
-                    date: formatDate(newTodo.createdAt)
-                })
-            }).catch(err => console.error('Telegram API Error:', err));
-
-            todoInput.value = '';
-            
-            // Reset input focus styling
-            todoInput.focus();
-            
-            render();
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('API 오류');
+                
+                // Refresh list
+                await fetchTodos();
+                
+                todoInput.value = '';
+                todoInput.focus();
+            } catch (err) {
+                console.error(err);
+                alert('추가에 실패했습니다.');
+                setLoading(false);
+            }
         });
 
         // Toggle Todo status
-        window.toggleTodo = function(id) {
-            todos = todos.map(todo => {
-                if (todo.id === id) {
-                    return { ...todo, completed: !todo.completed };
-                }
-                return todo;
-            });
-            saveTodos();
-            render();
+        window.toggleTodo = async function(id, currentCompleted) {
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed: !currentCompleted })
+                });
+                if (!res.ok) throw new Error('API 오류');
+                await fetchTodos();
+            } catch (err) {
+                console.error(err);
+                alert('업데이트에 실패했습니다.');
+                setLoading(false);
+            }
         };
 
-        // Delete single Todo
-        window.deleteTodo = function(id) {
-            todos = todos.filter(todo => todo.id !== id);
-            saveTodos();
-            render();
+        // Move to Trash
+        window.deleteTodo = async function(id) {
+            if(!confirm('휴지통으로 이동하시겠습니까?')) return;
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Trash' })
+                });
+                if (!res.ok) throw new Error('API 오류');
+                await fetchTodos();
+            } catch (err) {
+                console.error(err);
+                alert('삭제에 실패했습니다.');
+                setLoading(false);
+            }
+        };
+
+        // Restore from Trash
+        window.restoreTodo = async function(id) {
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Active' })
+                });
+                if (!res.ok) throw new Error('API 오류');
+                await fetchTodos();
+            } catch (err) {
+                console.error(err);
+                alert('복원에 실패했습니다.');
+                setLoading(false);
+            }
         };
 
         // Clear completed
-        btnClearCompleted.addEventListener('click', () => {
-            const completed = todos.filter(t => t.completed);
+        btnClearCompleted.addEventListener('click', async () => {
+            const activeTodos = allTodos.filter(t => t.status === 'Active');
+            const completed = activeTodos.filter(t => t.completed);
             if (completed.length === 0) {
                 alert('완료된 할 일이 없습니다!');
                 return;
             }
-            if (confirm('완료된 할 일을 모두 삭제하시겠습니까?')) {
-                todos = todos.filter(todo => !todo.completed);
-                saveTodos();
-                render();
+            if (confirm('완료된 항목들을 휴지통으로 이동하시겠습니까?')) {
+                setLoading(true);
+                try {
+                    for (const t of completed) {
+                        await fetch(`${API_BASE_URL}/api/todos/${t.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: 'Trash' })
+                        });
+                    }
+                    await fetchTodos();
+                } catch (err) {
+                    console.error(err);
+                    alert('일부 항목 삭제에 실패했습니다.');
+                    setLoading(false);
+                }
             }
         });
 
-        // Reset all
-        btnResetAll.addEventListener('click', () => {
-            if (confirm('모든 요청사항을 지우고 초기화하시겠습니까?')) {
-                todos = [];
-                saveTodos();
-                render();
+        // Toggle Trash View
+        btnTrashToggle.addEventListener('click', () => {
+            isTrashView = !isTrashView;
+            if (isTrashView) {
+                mainHeader.classList.replace('bg-amber-500', 'bg-slate-700');
+                pageTitle.innerHTML = '🗑️ 휴지통';
+                pageDesc.textContent = '삭제된 항목들은 30일 후 완전히 지워집니다.';
+                btnTrashToggle.innerHTML = '⬅️ 돌아가기';
+                btnTrashToggle.classList.replace('bg-white/20', 'bg-emerald-500');
+                btnTrashToggle.classList.replace('hover:bg-white/30', 'hover:bg-emerald-600');
+                formContainer.classList.add('hidden');
+                footerContainer.classList.add('hidden');
+            } else {
+                mainHeader.classList.replace('bg-slate-700', 'bg-amber-500');
+                pageTitle.innerHTML = '📝 해주세요';
+                pageDesc.textContent = '매장에 필요한 요청사항이나 주문필요사항 남겨주세요.';
+                btnTrashToggle.innerHTML = '🗑️ 휴지통';
+                btnTrashToggle.classList.replace('bg-emerald-500', 'bg-white/20');
+                btnTrashToggle.classList.replace('hover:bg-emerald-600', 'hover:bg-white/30');
+                formContainer.classList.remove('hidden');
+                footerContainer.classList.remove('hidden');
             }
+            render();
         });
 
         // Helper to prevent XSS
