@@ -51,10 +51,13 @@
                 </div>
             </div>
             
-            <!-- [수정사항: 2026-06-08] 하단 업데이트 버튼 추가 -->
-            <div class="px-2 pb-4 mt-2">
-                <button id="btnSaveBottom" class="btn-press w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
-                    서버에 데이터 전송 <span id="changeCountBadgeBottom" class="ml-2 bg-white text-emerald-800 text-xs py-0.5 px-2 rounded-full font-bold hidden">0</span>
+            <!-- [수정사항: 2026-06-15] 하단 버튼 영역 분할 및 최신 업 버튼 추가 -->
+            <div class="px-2 pb-4 mt-2 grid grid-cols-2 gap-2">
+                <button id="btnSaveBottom" class="btn-press bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
+                    서버에 데이터 전송 <span id="changeCountBadgeBottom" class="ml-1.5 bg-white text-emerald-800 text-[10px] py-0.5 px-1.5 rounded-full font-bold hidden">0</span>
+                </button>
+                <button id="btnOpenLatest" class="btn-press bg-slate-700 hover:bg-slate-800 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
+                    최신 업
                 </button>
             </div>
             
@@ -62,6 +65,35 @@
         </main>
 
         <!-- Sticky Bottom Button Removed -->
+
+        <!-- [수정사항 2026-06-15] 최신 업데이트 내역 모달 -->
+        <div id="latestUpdatesModal" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-sm z-40 flex flex-col justify-end">
+            <!-- Modal Body (Slides up or sits elegantly) -->
+            <div class="bg-slate-50 rounded-t-3xl h-[85%] flex flex-col shadow-2xl border-t border-slate-100 overflow-hidden">
+                <!-- Modal Header -->
+                <div class="px-4 py-3 bg-white border-b border-slate-200 flex items-center justify-between">
+                    <h2 class="font-bold text-slate-800 text-base flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-emerald-600"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                        최신 업데이트 내역
+                    </h2>
+                    <button id="btnCloseLatest" class="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 active:scale-95 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                
+                <!-- Filter Tabs -->
+                <div class="px-4 py-2 border-b border-slate-200 bg-white flex gap-2">
+                    <button id="btnFilterToday" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm transition-all">오늘</button>
+                    <button id="btnFilter3Days" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-all">3일</button>
+                    <button id="btnFilter1Week" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-all">1주일</button>
+                </div>
+                
+                <!-- List Content -->
+                <div class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-100" id="latestUpdatesList">
+                    <div class="text-center text-slate-400 py-10 text-xs">업데이트 내역을 불러오는 중...</div>
+                </div>
+            </div>
+        </div>
 
         <!-- Overlay Loading -->
         <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">

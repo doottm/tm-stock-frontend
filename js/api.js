@@ -25,6 +25,18 @@ const API = {
         }
     },
 
+    async getMovements(days = 7) {
+        if (CONFIG.USE_MOCK) return [];
+        try {
+            const response = await fetch(`${API_ENDPOINTS.MOVEMENTS}?days=${days}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching movements:', error);
+            return [];
+        }
+    },
+
     async postMovement(payload) {
         if (CONFIG.USE_MOCK) return { success: true };
         try {

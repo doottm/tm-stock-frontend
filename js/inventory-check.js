@@ -210,5 +210,94 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnSave.addEventListener('click', saveHandler);
     if(btnSaveBottom) btnSaveBottom.addEventListener('click', saveHandler);
 
+    // [수정사항 2026-06-15] 최신 업데이트 내역 모달 관련 로직 추가
+    const latestUpdatesModal = document.getElementById('latestUpdatesModal');
+    const btnOpenLatest = document.getElementById('btnOpenLatest');
+    const btnCloseLatest = document.getElementById('btnCloseLatest');
+    const btnFilterToday = document.getElementById('btnFilterToday');
+    const btnFilter3Days = document.getElementById('btnFilter3Days');
+    const btnFilter1Week = document.getElementById('btnFilter1Week');
+
+    const updateFilterTabUI = (activeBtn) => {
+        [btnFilterToday, btnFilter3Days, btnFilter1Week].forEach(btn => {
+            if (btn === activeBtn) {
+                btn.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm transition-all";
+            } else {
+                btn.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 transition-all";
+            }
+        });
+    };
+
+    const loadLatestUpdates = async (days) => {
+        const listEl = document.getElementById('latestUpdatesList');
+        listEl.innerHTML = '<div class="text-center text-slate-400 py-10 text-xs">업데이트 내역을 불러오는 중...</div>';
+        
+        try {
+            const data = await API.getMovements(days);
+            listEl.innerHTML = '';
+            
+            if (data.length === 0) {
+                listEl.innerHTML = '<div class="text-center text-slate-400 py-10 text-xs">해당 기간의 업데이트 내역이 없습니다.</div>';
+                return;
+            }
+            
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-2.5 bg-white border border-slate-100 rounded-xl shadow-sm space-y-1";
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[120px]">${item.supplier}</span>
+                        <span class="text-xs font-bold text-emerald-600">${item.quantity} 개</span>
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm leading-snug">${item.item_name}</div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                        <span class="text-red-500 font-semibold">${item.date}</span>
+                        <span class="font-bold text-blue-500">👤 ${item.worker}</span>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        } catch (err) {
+            console.error('Error loading latest updates:', err);
+            listEl.innerHTML = '<div class="text-center text-red-500 py-10 text-xs">데이터 로드에 실패했습니다.</div>';
+        }
+    };
+
+    if (btnOpenLatest) {
+        btnOpenLatest.addEventListener('click', () => {
+            latestUpdatesModal.classList.remove('hidden');
+            updateFilterTabUI(btnFilterToday);
+            loadLatestUpdates(0); // 기본값: 오늘 (0일)
+        });
+    }
+
+    if (btnCloseLatest) {
+        btnCloseLatest.addEventListener('click', () => {
+            latestUpdatesModal.classList.add('hidden');
+        });
+    }
+
+    if (btnFilterToday) {
+        btnFilterToday.addEventListener('click', () => {
+            updateFilterTabUI(btnFilterToday);
+            loadLatestUpdates(0);
+        });
+    }
+
+    if (btnFilter3Days) {
+        btnFilter3Days.addEventListener('click', () => {
+            updateFilterTabUI(btnFilter3Days);
+            loadLatestUpdates(3);
+        });
+    }
+
+    if (btnFilter1Week) {
+        btnFilter1Week.addEventListener('click', () => {
+            updateFilterTabUI(btnFilter1Week);
+            loadLatestUpdates(7);
+        });
+    }
+
     renderList();
 });
