@@ -246,12 +246,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.className = "p-2.5 bg-white border border-slate-100 rounded-xl shadow-sm space-y-1";
                 
                 card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[120px]">${item.supplier}</span>
-                        <span class="text-xs font-bold text-emerald-600">${item.quantity} 개</span>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center min-w-0 flex-1">
+                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.5 rounded mr-1.5 shrink-0">${item.supplier}</span>
+                            <span class="font-bold text-slate-800 text-sm truncate">${item.item_name}</span>
+                        </div>
+                        <span class="text-xs font-bold text-emerald-600 shrink-0">${item.quantity} 개</span>
                     </div>
-                    <div class="font-bold text-slate-800 text-sm leading-snug">${item.item_name}</div>
-                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                    <div class="flex items-center justify-between text-[11px] text-slate-500">
                         <span class="text-red-500 font-semibold">${item.date}</span>
                         <span class="font-bold text-blue-500">👤 ${item.worker}</span>
                     </div>

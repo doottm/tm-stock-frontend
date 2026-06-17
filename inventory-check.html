@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- [수정사항 2026-05-19] 1. 헤더 초압축, 2. 카드 초압축 (12개 노출 목표), 3. 버튼 텍스트 변경 -->
-    <title>현재고 확인 - 스마트 재고관리</title>
+    <title>재고 - 스마트 재고관리</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -19,7 +19,7 @@
                     <a href="index.html" class="w-7 h-7 flex items-center justify-center rounded-full bg-emerald-700/50 hover:bg-emerald-800 text-white mr-1.5 active:scale-95 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
                     </a>
-                    <h1 class="text-sm font-bold">📋 현재고 실사</h1>
+                    <h1 class="text-sm font-bold">📋 재고</h1>
                 <div class="bg-emerald-700/50 text-emerald-100 text-[10px] rounded p-1 px-2 font-bold flex items-center">
                     👤 <span id="workerNameDisplay" class="ml-1 text-white text-xs">로딩중</span>
                 </div>
@@ -51,13 +51,13 @@
                 </div>
             </div>
             
-            <!-- [수정사항: 2026-06-15] 하단 버튼 영역 분할 및 최신 업 버튼 추가 -->
+            <!-- [수정사항: 2026-06-17] 하단 버튼 영역 최신업(좌), 업데이트(우) 순서 및 이름 변경 -->
             <div class="px-2 pb-4 mt-2 grid grid-cols-2 gap-2">
-                <button id="btnSaveBottom" class="btn-press bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
-                    서버에 데이터 전송 <span id="changeCountBadgeBottom" class="ml-1.5 bg-white text-emerald-800 text-[10px] py-0.5 px-1.5 rounded-full font-bold hidden">0</span>
-                </button>
                 <button id="btnOpenLatest" class="btn-press bg-slate-700 hover:bg-slate-800 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
                     최신 업
+                </button>
+                <button id="btnSaveBottom" class="btn-press bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl py-3 shadow-md flex justify-center items-center">
+                    업데이트 <span id="changeCountBadgeBottom" class="ml-1.5 bg-white text-emerald-800 text-[10px] py-0.5 px-1.5 rounded-full font-bold hidden">0</span>
                 </button>
             </div>
             

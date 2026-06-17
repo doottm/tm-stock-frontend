@@ -294,18 +294,42 @@
                         ? `삭제: ${new Date(todo.deletedAt).toLocaleDateString('ko-KR')}` 
                         : `작성: ${formatDate(todo.createdAt)}`;
 
+                    const progressVal = todo.progress || '진행중';
+                    const progressBadgeHtml = `
+                        <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ${progressVal === '완료' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">
+                            ${progressVal}
+                        </span>
+                    `;
+
+                    let buttonRowHtml = '';
+                    if (!isTrashView && !todo.completed) {
+                        const confirmVal = todo.confirm || '확인';
+                        const confirmBtn = confirmVal === '확인중' 
+                            ? `<span class="inline-block text-[11px] font-bold bg-slate-100 text-slate-400 border border-slate-200 px-2 py-1 rounded-lg">확인중</span>`
+                            : `<button onclick="confirmTodo('${todo.id}')" class="btn-press text-[11px] font-bold bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1 rounded-lg transition-all shadow-sm">확인</button>`;
+                        
+                        buttonRowHtml = `
+                            <div class="flex gap-2 mt-1.5">
+                                ${confirmBtn}
+                                <button onclick="completeTodo('${todo.id}')" class="btn-press text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg transition-all shadow-sm">완료</button>
+                            </div>
+                        `;
+                    }
+
                     li.innerHTML = `
                         <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
                             ${actionsHtml}
-                            <div class="flex flex-col min-w-0 gap-1">
+                            <div class="flex flex-col min-w-0 gap-1 flex-1">
                                 <span class="todo-text text-sm font-semibold break-all leading-tight ${todo.completed && !isTrashView ? 'text-slate-400' : 'text-slate-800'}">${escapeHtml(todo.text)}</span>
                                 <div class="flex flex-wrap gap-1.5 items-center">
                                     <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold ${badge.bg} ${badge.text}">
                                         <span class="w-1 h-1 rounded-full ${badge.dot}"></span>
                                         ${badge.label}
                                     </span>
+                                    ${progressBadgeHtml}
                                     <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(creatorName)} • ${dateString}</span>
                                 </div>
+                                ${buttonRowHtml}
                             </div>
                         </div>
                         ${deleteBtnHtml}
@@ -369,6 +393,42 @@
                 setLoading(false);
             }
         });
+
+        // [수정사항 2026-06-17] 확인 버튼 처리 함수
+        window.confirmTodo = async function(id) {
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ confirm: '확인중' })
+                });
+                if (!res.ok) throw new Error('API 오류');
+                await fetchTodos();
+            } catch (err) {
+                console.error(err);
+                alert('상태 업데이트에 실패했습니다.');
+                setLoading(false);
+            }
+        };
+
+        // [수정사항 2026-06-17] 완료 버튼 처리 함수
+        window.completeTodo = async function(id) {
+            setLoading(true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ progress: '완료' })
+                });
+                if (!res.ok) throw new Error('API 오류');
+                await fetchTodos();
+            } catch (err) {
+                console.error(err);
+                alert('완료 처리에 실패했습니다.');
+                setLoading(false);
+            }
+        };
 
         // Toggle Todo status
         window.toggleTodo = async function(id, currentCompleted) {
