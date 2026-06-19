@@ -610,6 +610,21 @@ function closeActiveWebSocket() {
 }
 
 // --- WebSocket Connection & Setup ---
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+async function wakeUpServer() {
+  // Render free tier를 HTTP ping으로 먼저 깨움
+  try {
+    const httpBase = getBackendHttpUrl();
+    updateConnectionStatus('connecting', '서버 기동 중... (최대 30초 소요)');
+    await fetch(`${httpBase}/`, { method: 'GET', signal: AbortSignal.timeout(35000) });
+    console.log('[Wake-up] Server responded to HTTP ping.');
+  } catch (e) {
+    console.warn('[Wake-up] Server ping failed:', e.message);
+  }
+}
+
 function connectWebSocket() {
   const url = getBackendWsUrl();
   console.log(`[WebSocket] Connecting to: ${url}`);
@@ -620,6 +635,7 @@ function connectWebSocket() {
 
   ws.onopen = () => {
     console.log('[WebSocket] Connection open.');
+    reconnectAttempts = 0; // 성공 시 재시도 카운터 초기화
     updateConnectionStatus('connected', '실시간 통역 준비 완료');
     showToast('통역 서버에 연결되었습니다.');
     
@@ -661,13 +677,30 @@ function connectWebSocket() {
 
   ws.onclose = (event) => {
     console.log(`[WebSocket] Connection closed. Code: ${event.code}`);
-    updateConnectionStatus('disconnected', '서버 연결 끊김 (클릭하여 재연결)');
-    showToast('통역 서버와의 연결이 끊겼습니다.', 'error');
+    
+    // 자동 재연결 (최대 5회, 간격 증가)
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      reconnectAttempts++;
+      const delay = Math.min(reconnectAttempts * 5000, 20000); // 5, 10, 15, 20, 20초
+      updateConnectionStatus('connecting', `재연결 시도 중... (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}, ${delay/1000}초 후)`);
+      console.log(`[WebSocket] Auto-reconnect in ${delay}ms (attempt ${reconnectAttempts})`);
+      
+      setTimeout(async () => {
+        if (reconnectAttempts === 1) await wakeUpServer(); // 첫 재시도 전에 서버 wake-up
+        closeActiveWebSocket();
+        connectWebSocket();
+      }, delay);
+    } else {
+      updateConnectionStatus('disconnected', '서버 연결 끊김 (클릭하여 재연결)');
+      showToast('통역 서버와의 연결이 끊겼습니다.', 'error');
+      reconnectAttempts = 0;
+    }
   };
 
   ws.onerror = (err) => {
     console.error('[WebSocket] Error:', err);
-    updateConnectionStatus('disconnected', '연결 오류 발생');
+    // onerror는 항상 onclose 직전에 발생하므로 상태 업데이트만
+    updateConnectionStatus('connecting', '연결 오류 - 재시도 중...');
   };
 }
 
@@ -990,7 +1023,8 @@ btnStartApp.addEventListener('click', async () => {
     }
     
     welcomeOverlay.classList.add('hidden');
-    // Connect websocket after audio starts
+    // Render 서버 wake-up 후 WebSocket 연결
+    await wakeUpServer();
     connectWebSocket();
   } catch (err) {
     console.error('Failed initialization on user gesture:', err);
