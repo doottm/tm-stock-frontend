@@ -350,7 +350,7 @@ async function sendTextMessage(text) {
   currentCustomerTurnText = "";
   
   try {
-    const response = await fetch('/api/translate', {
+    const response = await fetch(`${getBackendHttpUrl()}/api/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -399,22 +399,35 @@ function showToast(message, type = 'success') {
 }
 
 // --- Dynamic Backend URL Discovery ---
+// [수정 2026-06-20] 프론트(Netlify)와 백엔드(Render)가 분리되어 있으므로
+//   localhost가 아닌 경우에는 항상 Render 백엔드 URL을 사용
+const RENDER_BACKEND_WS = 'wss://tm-stock-server.onrender.com/ws';
+const RENDER_BACKEND_HTTP = 'https://tm-stock-server.onrender.com';
+
 function getBackendWsUrl() {
-  let url = localStorage.getItem('BACKEND_WS_URL');
-  if (!url) {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      url = 'ws://localhost:3000/ws';
-    } else if (window.location.protocol.startsWith('http')) {
-      url = `${protocol}://${host}/ws`;
-    } else {
-      // Deployed layout fallback
-      url = 'wss://ag-translation-backend.onrender.com/ws';
-    }
+  // localStorage에 수동 설정된 URL이 있으면 그것을 우선 사용 (개발/테스트용)
+  const saved = localStorage.getItem('BACKEND_WS_URL');
+  if (saved) return saved;
+
+  // 로컬 개발 환경
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'ws://localhost:3000/ws';
   }
-  return url;
+
+  // 배포 환경 (Netlify 등): 항상 Render 백엔드 사용
+  return RENDER_BACKEND_WS;
+}
+
+function getBackendHttpUrl() {
+  const saved = localStorage.getItem('BACKEND_WS_URL');
+  if (saved) {
+    // ws:// → http://, wss:// → https://
+    return saved.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:').replace('/ws', '');
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return RENDER_BACKEND_HTTP;
 }
 
 // --- Initialize Audio Context & Stream ---
@@ -905,8 +918,7 @@ async function saveConsultationLog() {
   btnSaveLog.disabled = true;
   btnSaveLog.textContent = '저장 중...';
 
-  const httpUrl = getBackendWsUrl().replace(/^ws/, 'http'); // Convert ws:// to http://
-  const logEndpoint = `${httpUrl.split('/ws')[0]}/api/log`;
+  const logEndpoint = `${getBackendHttpUrl()}/api/log`;
 
   try {
     const response = await fetch(logEndpoint, {
