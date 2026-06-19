@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>실시간 대면 통역 및 안내 시스템 - Face-to-Face Translation</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/translate-style.css">
+</head>
+<body>
+
+  <!-- Audio Context Initial Activation Screen (Click to Start) -->
+  <div id="welcome-overlay" class="overlay">
+    <div class="overlay-card">
+      <div class="logo-animation">
+        <div class="circle pulse-1"></div>
+        <div class="circle pulse-2"></div>
+        <div class="logo-inner">🎙️</div>
+      </div>
+      <h2>대면 실시간 통역 서비스</h2>
+      <p>마이크 및 오디오 시스템을 활성화하려면 아래 시작 버튼을 눌러주세요.</p>
+      <button id="btn-start-app" class="btn-primary">시스템 시작하기</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- TOP SECTION: Customer Area (Rotated 180 degrees) -->
+    <section id="section-customer" class="split-pane customer-pane">
+      <div class="pane-content">
+        <!-- Floating Header -->
+        <div class="pane-header">
+          <div id="customer-badge" class="badge badge-customer">Customer (고객)</div>
+          <div id="customer-status" class="status-indicator">Ready to speak</div>
+        </div>
+
+        <!-- Big Subtitles Display -->
+        <div class="subtitle-container">
+          <div id="customer-subtitle-target" class="subtitle-text placeholder-text">
+            Your translation will appear here.
+          </div>
+          <div id="customer-subtitle-source" class="subtitle-subtext">
+            (이곳에 번역된 텍스트가 표시됩니다)
+          </div>
+        </div>
+
+        <!-- Big Mic Button -->
+        <div class="controls-row">
+          <button id="btn-mic-customer" class="btn-mic btn-customer-mic">
+            <span class="mic-icon">🎙️</span>
+            <span class="mic-label">Press to Speak</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MIDDLE DIVIDER: Status Bar -->
+    <div class="divider-bar">
+      <div class="connection-pill">
+        <span id="connection-dot" class="dot dot-disconnected"></span>
+        <span id="connection-text">서버 연결 대기 중</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM SECTION: Staff Area (Normal Direction) -->
+    <section id="section-staff" class="split-pane staff-pane">
+      <div class="pane-content">
+        <!-- Header Controls -->
+        <div class="pane-header">
+          <div class="badge badge-staff">Staff (직원)</div>
+          
+          <div class="header-options">
+            <!-- Target Language Select -->
+            <div class="select-wrapper">
+              <label for="select-language">고객 언어:</label>
+              <select id="select-language" class="form-select">
+                <option value="en">English (영어)</option>
+                <option value="ja">日本語 (일본어)</option>
+                <option value="zh-CN">简体中文 (중국어 간체)</option>
+                <option value="zh-TW">繁體中文 (중국어 번체)</option>
+                <option value="es">Español (스페인어)</option>
+                <option value="fr">Français (프랑스어)</option>
+                <option value="vi">Tiếng Việt (베트남어)</option>
+              </select>
+            </div>
+
+            <!-- Mic Control Mode (Toggle vs PTT) -->
+            <div class="toggle-mode-wrapper">
+              <span>PTT (누르고 말하기)</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-mic-mode" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Script Display -->
+        <div class="subtitle-container">
+          <div id="staff-subtitle-source" class="subtitle-text placeholder-text">
+            마이크를 켜고 한국어로 말씀해 주세요.
+          </div>
+          <div id="staff-subtitle-target" class="subtitle-subtext">
+            (번역기 대기 중)
+          </div>
+        </div>
+
+        <!-- Quick Phrases Section -->
+        <div class="quick-phrases-section">
+          <div class="quick-phrases-header">
+            <span class="section-title">⚡ 자주 사용하는 문구 (클릭 시 자동 전송/통역)</span>
+            <button id="btn-add-phrase" class="btn-icon-add" title="문구 추가">+</button>
+          </div>
+          <div id="quick-phrases-container" class="quick-phrases-container">
+            <!-- Dynamically populated chips -->
+          </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="controls-row justify-between">
+          <!-- Session Log Action -->
+          <div class="action-buttons-group" style="display: flex; gap: 10px;">
+            <button id="btn-save-log" class="btn-secondary">
+              <span>💾</span> 상담 저장
+            </button>
+            <button id="btn-settings" class="btn-secondary">
+              <span>⚙️</span> 백엔드 설정
+            </button>
+          </div>
+
+          <!-- Staff Mic Button -->
+          <button id="btn-mic-staff" class="btn-mic btn-staff-mic">
+            <span class="mic-icon">🎙️</span>
+            <span class="mic-label">누르고 말하기</span>
+          </button>
+
+          <!-- Spacer to balance -->
+          <div style="width: 110px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Load client app logic -->
+  <script src="js/translate-app.js"></script>
+</body>
+</html>

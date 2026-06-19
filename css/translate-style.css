@@ -1,0 +1,915 @@
+/* ==========================================================================
+   Design System & Variable Declarations
+   ========================================================================== */
+:root {
+  --font-primary: 'Outfit', 'Noto Sans KR', sans-serif;
+  
+  /* Color Palettes */
+  --bg-app: #080b11;
+  --bg-pane-staff: rgba(20, 26, 38, 0.75);
+  --bg-pane-customer: rgba(28, 22, 43, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+
+  --color-staff: #3b82f6; /* Slate Blue */
+  --color-staff-hover: #60a5fa;
+  --color-customer: #a855f7; /* Vibrant Purple */
+  --color-customer-hover: #c084fc;
+  
+  --color-success: #10b981; /* Emerald Green */
+  --color-danger: #ef4444;
+  --color-text-main: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --glass-blur: 16px;
+}
+
+/* ==========================================================================
+   Global Reset & Base Style
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-app);
+  color: var(--color-text-main);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Welcome Overlay (Frosted Glass)
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 11, 17, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.overlay-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3rem 2rem;
+  border-radius: 24px;
+  text-align: center;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+}
+
+.overlay-card h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.overlay-card p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.logo-animation {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 2rem;
+}
+
+.logo-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.2rem;
+  z-index: 2;
+}
+
+.circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.15);
+  top: 0;
+  left: 0;
+}
+
+.pulse-1 {
+  animation: pulse-ring 2.5s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+}
+
+.pulse-2 {
+  animation: pulse-ring 2.5s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+  animation-delay: 1.2s;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* ==========================================================================
+   Layout Structure: Split Screen
+   ========================================================================== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+}
+
+.split-pane {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2.5rem;
+}
+
+/* Glassmorphism Backgrounds & Textures */
+.customer-pane {
+  background: var(--bg-pane-customer);
+  border-bottom: 1px solid var(--border-color);
+  /* Rotated 180 degrees so opposite user sees it normally */
+  transform: rotate(180deg);
+  transform-origin: center center;
+  flex: 1;
+  height: 33.33vh;
+}
+
+.staff-pane {
+  background: var(--bg-pane-staff);
+  border-top: 1px solid var(--border-color);
+  flex: 2;
+  height: 66.67vh;
+}
+
+.pane-content {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   Headers & Badges
+   ========================================================================== */
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.8rem;
+  border-radius: 30px;
+  border: 1px solid transparent;
+}
+
+.badge-staff {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-staff);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.badge-customer {
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--color-customer);
+  border-color: rgba(168, 85, 247, 0.2);
+}
+
+.status-indicator {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-text-muted);
+}
+
+.status-indicator.speaking {
+  color: var(--color-success);
+}
+
+.status-indicator.speaking::before {
+  background-color: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+  animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.header-options {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* ==========================================================================
+   Subtitles Display Area
+   ========================================================================== */
+.subtitle-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 0;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 120px;
+}
+
+.subtitle-text {
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere; /* 자동 줄바꿈 강제 (화면 이탈 방지) */
+  transition: color 0.3s ease, font-size 0.2s ease; /* 글자 크기 변경 시 부드럽게 전환 */
+  max-height: 130px;
+  overflow-y: auto;
+  padding: 0 10px;
+}
+
+.subtitle-text::-webkit-scrollbar {
+  width: 10px; /* 클릭 및 터치 영역 확대 (4px -> 10px) */
+}
+.subtitle-text::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15); /* 트랙 영역 명시 */
+  border-radius: 10px;
+}
+.subtitle-text::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25); /* 시인성 제고 */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.subtitle-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45); /* 호버 시 밝기 강조 */
+  background-clip: padding-box;
+}
+
+.placeholder-text {
+  color: rgba(255, 255, 255, 0.15) !important;
+  font-weight: 400;
+}
+
+.subtitle-subtext {
+  margin-top: 0.8rem;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  opacity: 0.85;
+  word-break: keep-all;
+  overflow-wrap: anywhere; /* 서브텍스트도 넘치지 않도록 자동 줄바꿈 */
+  transition: font-size 0.2s ease;
+}
+
+/* ==========================================================================
+   Form Controls: Language Select, Switches
+   ========================================================================== */
+.select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select-wrapper label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.form-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 0.45rem 1.8rem 0.45rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.75rem;
+}
+
+.form-select:hover, .form-select:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Toggle Switch for PTT vs Toggle Mode */
+.toggle-mode-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .3s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--color-staff);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--color-staff);
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* ==========================================================================
+   Buttons and Mic Interaction
+   ========================================================================== */
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+/* Giant Microphone Button */
+.btn-mic {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1.8rem;
+  border-radius: 50px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn-mic .mic-icon {
+  font-size: 1.3rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-mic .mic-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Hover effects */
+.btn-staff-mic:hover {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+}
+
+.btn-customer-mic:hover {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+}
+
+.btn-mic:active {
+  transform: scale(0.97);
+}
+
+/* Active / Speaking State with Pulse Animation */
+.btn-staff-mic.recording {
+  background: var(--color-staff) !important;
+  border-color: var(--color-staff) !important;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.45);
+  animation: mic-pulse-staff 1.5s infinite alternate;
+}
+
+.btn-customer-mic.recording {
+  background: var(--color-customer) !important;
+  border-color: var(--color-customer) !important;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+  animation: mic-pulse-customer 1.5s infinite alternate;
+}
+
+@keyframes mic-pulse-staff {
+  0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+  100% { box-shadow: 0 0 28px rgba(59, 130, 246, 0.65); }
+}
+
+@keyframes mic-pulse-customer {
+  0% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+  100% { box-shadow: 0 0 28px rgba(168, 85, 247, 0.65); }
+}
+
+/* Secondary Actions */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  padding: 0.65rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.btn-primary {
+  background: var(--color-staff);
+  border: none;
+  color: #fff;
+  padding: 0.85rem 2rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+.btn-primary:hover {
+  background: var(--color-staff-hover);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   Middle Divider & Connection Pill
+   ========================================================================== */
+.divider-bar {
+  position: absolute;
+  top: 33.33%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Let clicks pass through if needed, though they shouldn't hit here */
+}
+
+.connection-pill {
+  background: rgba(13, 17, 28, 0.9);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  pointer-events: auto; /* Enable clicks on the pill itself since parent has pointer-events: none */
+  transition: all 0.2s ease;
+}
+
+.connection-pill:hover {
+  background: rgba(22, 28, 45, 0.95);
+  border-color: var(--color-success);
+  color: var(--color-text-main);
+  transform: scale(1.02);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-connected {
+  background-color: var(--color-success);
+  box-shadow: 0 0 6px var(--color-success);
+}
+
+.dot-disconnected {
+  background-color: var(--color-danger);
+  box-shadow: 0 0 6px var(--color-danger);
+  animation: pulse-danger 1.5s infinite;
+}
+
+@keyframes pulse-danger {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* ==========================================================================
+   Toast Notification System
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.toast {
+  background: rgba(13, 17, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slide-up-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  backdrop-filter: blur(8px);
+}
+
+.toast.success {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.toast.error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Quick Phrases Styling
+   ========================================================================== */
+.quick-phrases-section {
+  margin-top: 1.2rem;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.quick-phrases-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.btn-icon-add {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-staff);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.btn-icon-add:hover {
+  background: rgba(59, 130, 246, 0.15); /* color-staff is #3b82f6 */
+  border-color: var(--color-staff);
+  transform: scale(1.1);
+}
+
+.quick-phrases-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 80px;
+  overflow-y: auto;
+  padding-right: 12px; /* 스크롤바 영역을 위해 여백 확장 */
+}
+
+/* Custom scrollbar for container */
+.quick-phrases-container::-webkit-scrollbar {
+  width: 10px; /* 클릭 및 터치 영역 확대 (4px -> 10px) */
+}
+.quick-phrases-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15); /* 트랙 영역 명시 */
+  border-radius: 10px;
+}
+.quick-phrases-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25); /* 시인성 제고 */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.quick-phrases-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45); /* 호버 시 밝기 강조 */
+  background-clip: padding-box;
+}
+
+.phrase-chip {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.phrase-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-staff);
+  color: var(--color-text-main);
+  transform: translateY(-1px);
+}
+
+.phrase-chip:active {
+  transform: translateY(0);
+}
+
+.btn-delete-phrase {
+  display: inline-flex;
+  margin-left: 6px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-delete-phrase:hover {
+  color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* ==========================================================================
+   Media Queries & Responsiveness
+   ========================================================================== */
+/* ==========================================================================
+   Media Queries & Responsiveness
+   ========================================================================== */
+@media (max-width: 768px) {
+  .split-pane {
+    padding: 1.2rem;
+  }
+  
+  .subtitle-text {
+    font-size: 1.6rem;
+    max-height: 90px;
+  }
+  
+  .subtitle-subtext {
+    font-size: 0.95rem;
+  }
+
+  .header-options {
+    gap: 0.75rem;
+  }
+  
+  .toggle-mode-wrapper {
+    font-size: 0.75rem;
+  }
+
+  .form-select {
+    padding: 0.35rem 1.5rem 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-mic {
+    padding: 0.7rem 1.4rem;
+  }
+  
+  .btn-mic .mic-label {
+    font-size: 0.85rem;
+  }
+}
+
+/* 초소형 모바일 기기 (스마트폰 세로 모드) 최적화 */
+@media (max-width: 480px) {
+  /* 여백을 극적으로 축소하여 가로 공간 확보 */
+  .split-pane {
+    padding: 0.8rem;
+  }
+
+  .pane-content {
+    gap: 0.5rem;
+  }
+
+  /* 고객 영역(1/3 pane) 오버헤드 높이 부족 대응 */
+  .customer-pane .btn-mic {
+    padding: 0.5rem 1.2rem;
+    min-height: auto;
+  }
+  .customer-pane .btn-mic .mic-icon {
+    font-size: 1.1rem;
+  }
+  .customer-pane .btn-mic .mic-label {
+    font-size: 0.75rem;
+  }
+
+  /* 자막 레이아웃 스페이싱 최소화 */
+  .subtitle-container {
+    padding: 0.5rem 0;
+    min-height: 90px;
+  }
+  .subtitle-text {
+    font-size: 1.35rem;
+    max-height: 80px;
+  }
+  .subtitle-subtext {
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  /* 직원 설정 영역: 가로 정렬 시 뭉개지므로 2단 정렬 */
+  .staff-pane .pane-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  
+  .header-options {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  /* 상용구 영역 스케일 조정 */
+  .quick-phrases-section {
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+  .quick-phrases-container {
+    max-height: 70px;
+    gap: 6px;
+  }
+  .phrase-chip {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  /* 하단 직원 컨트롤 버튼 레이아웃 세로 적층 (2열 버튼 뭉개짐 방지) */
+  .staff-pane .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .staff-pane .action-buttons-group {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .staff-pane .action-buttons-group .btn-secondary {
+    flex: 1; /* 반반씩 균등 가로폭 분배 */
+    justify-content: center;
+    font-size: 0.75rem;
+    padding: 0.65rem;
+  }
+
+  /* 직원 마이크 단추 가로 100% 확장 (터치 편리성 극대화) */
+  .staff-pane .btn-mic {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  /* 모바일에서 우측 균형용 빈 스페이서 숨김 */
+  .staff-pane .controls-row > div[style*="width: 110px"] {
+    display: none !important;
+  }
+}
