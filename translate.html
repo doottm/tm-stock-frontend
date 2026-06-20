@@ -71,7 +71,12 @@
       <div class="pane-content">
         <!-- Header Controls -->
         <div class="pane-header">
-          <div class="badge badge-staff">Staff (직원)</div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="btn-back" class="btn-secondary" onclick="location.href='index.html'" style="padding: 0.4rem 0.8rem; border-radius: 30px;">
+              ← 뒤로
+            </button>
+            <div class="badge badge-staff">Staff (직원)</div>
+          </div>
           
           <div class="header-options">
             <!-- Target Language Select -->
@@ -126,9 +131,6 @@
           <div class="action-buttons-group" style="display: flex; gap: 10px;">
             <button id="btn-save-log" class="btn-secondary">
               <span>💾</span> 상담 저장
-            </button>
-            <button id="btn-settings" class="btn-secondary">
-              <span>⚙️</span> 백엔드 설정
             </button>
           </div>
 

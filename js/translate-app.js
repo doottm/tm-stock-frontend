@@ -48,7 +48,10 @@ const toggleMicMode = document.getElementById('toggle-mic-mode');
 const btnMicStaff = document.getElementById('btn-mic-staff');
 const btnMicCustomer = document.getElementById('btn-mic-customer');
 const btnSaveLog = document.getElementById('btn-save-log');
-const btnSettings = document.getElementById('btn-settings');
+
+// Stop timeouts for push-to-talk release delay
+let staffStopTimeout = null;
+let customerStopTimeout = null;
 
 const staffSubtitleSource = document.getElementById('staff-subtitle-source');
 const staffSubtitleTarget = document.getElementById('staff-subtitle-target');
@@ -193,27 +196,23 @@ function updateCustomerUILanguage() {
 }
 
 // --- Staff Canned Quick Phrases Feature ---
-const defaultPhrases = [
-  "안녕하세요. 무엇을 도와드릴까요?",
-  "이쪽에 서명해 주세요.",
-  "여권을 보여주시겠어요?",
-  "결제가 완료되었습니다. 감사합니다.",
-  "잠시만 기다려 주세요."
-];
+let quickPhrases = []; // Array of objects: [{ id, text }]
 
-let quickPhrases = [];
-
-function initQuickPhrases() {
-  const saved = localStorage.getItem('QUICK_PHRASES');
-  if (saved) {
-    try {
-      quickPhrases = JSON.parse(saved);
-    } catch (e) {
-      quickPhrases = [...defaultPhrases];
-    }
-  } else {
-    quickPhrases = [...defaultPhrases];
-    localStorage.setItem('QUICK_PHRASES', JSON.stringify(quickPhrases));
+async function initQuickPhrases() {
+  try {
+    const response = await fetch(`${getBackendHttpUrl()}/api/phrases`);
+    if (!response.ok) throw new Error('서버 응답 오류');
+    quickPhrases = await response.json();
+  } catch (e) {
+    console.error('[Quick Phrases] Error loading phrases from server:', e);
+    // Fallback in case of server connection failure
+    quickPhrases = [
+      { id: '1', text: "안녕하세요. 무엇을 도와드릴까요?" },
+      { id: '2', text: "이쪽에 서명해 주세요." },
+      { id: '3', text: "여권을 보여주시겠어요?" },
+      { id: '4', text: "결제가 완료되었습니다. 감사합니다." },
+      { id: '5', text: "잠시만 기다려 주세요." }
+    ];
   }
   renderPhrases();
 }
@@ -222,19 +221,19 @@ function renderPhrases() {
   if (!quickPhrasesContainer) return;
   quickPhrasesContainer.innerHTML = '';
   
-  quickPhrases.forEach((phrase, index) => {
+  quickPhrases.forEach((phraseObj) => {
     const chip = document.createElement('div');
     chip.className = 'phrase-chip';
     
     // Label span
     const labelSpan = document.createElement('span');
-    labelSpan.textContent = phrase;
+    labelSpan.textContent = phraseObj.text;
     chip.appendChild(labelSpan);
     
     // Click listener to send text
     labelSpan.addEventListener('click', (e) => {
       e.stopPropagation();
-      sendTextMessage(phrase);
+      sendTextMessage(phraseObj.text);
     });
     
     // Delete cross
@@ -244,7 +243,7 @@ function renderPhrases() {
     deleteBtn.title = '삭제';
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      deletePhrase(index);
+      deletePhrase(phraseObj.id);
     });
     chip.appendChild(deleteBtn);
     
@@ -252,19 +251,55 @@ function renderPhrases() {
   });
 }
 
-function addPhrase(text) {
+async function addPhrase(text) {
   if (!text || !text.trim()) return;
-  quickPhrases.push(text.trim());
-  localStorage.setItem('QUICK_PHRASES', JSON.stringify(quickPhrases));
-  renderPhrases();
-  showToast('상용구가 추가되었습니다.');
+  
+  try {
+    const response = await fetch(`${getBackendHttpUrl()}/api/phrases`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: text.trim() })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '상용구 추가 실패');
+    }
+    
+    const result = await response.json();
+    quickPhrases.push(result.phrase);
+    renderPhrases();
+    showToast('공통 상용구가 추가되었습니다.');
+  } catch (e) {
+    console.error('[Quick Phrases] Failed to add phrase:', e);
+    showToast('상용구 추가 실패: ' + e.message, 'error');
+  }
 }
 
-function deletePhrase(index) {
-  quickPhrases.splice(index, 1);
-  localStorage.setItem('QUICK_PHRASES', JSON.stringify(quickPhrases));
-  renderPhrases();
-  showToast('상용구가 삭제되었습니다.', 'info');
+async function deletePhrase(id) {
+  try {
+    const response = await fetch(`${getBackendHttpUrl()}/api/phrases/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: id })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '상용구 삭제 실패');
+    }
+    
+    quickPhrases = quickPhrases.filter(p => p.id !== id);
+    renderPhrases();
+    showToast('공통 상용구가 삭제되었습니다.', 'info');
+  } catch (e) {
+    console.error('[Quick Phrases] Failed to delete phrase:', e);
+    showToast('상용구 삭제 실패: ' + e.message, 'error');
+  }
 }
 
 // Send Text Turn to Gemini WebSocket Session
@@ -339,6 +374,17 @@ function speakText(text, langCode) {
 async function sendTextMessage(text) {
   console.log('[Quick Phrase] Translating canned phrase:', text);
   lastActiveSpeaker = 'staff';
+  
+  // iOS Safari Web Speech API (SpeechSynthesis) Unlock Hack
+  if (window.speechSynthesis) {
+    try {
+      const unlockUtterance = new SpeechSynthesisUtterance('');
+      unlockUtterance.volume = 0; // Silent
+      window.speechSynthesis.speak(unlockUtterance);
+    } catch (e) {
+      console.warn('[TTS] Failed to unlock speechSynthesis on user click:', e);
+    }
+  }
   
   // Pre-update UI for immediate feedback
   staffSubtitleSource.textContent = text;
@@ -812,9 +858,46 @@ function handleServerMessage(response) {
   }
 }
 
+// --- Audio Context Keep-Alive & Active Resume for iOS Safari ---
+let keepAliveInterval = null;
+
+function resumeAudioContext() {
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume()
+      .then(() => console.log('[Audio] AudioContext resumed successfully.'))
+      .catch(err => console.warn('[Audio] Failed to resume AudioContext:', err));
+  }
+}
+
+function startAudioKeepAlive() {
+  if (keepAliveInterval) clearInterval(keepAliveInterval);
+  
+  keepAliveInterval = setInterval(() => {
+    if (audioContext && audioContext.state === 'running') {
+      try {
+        // Play a silent buffer periodically to prevent iOS Safari from putting the audio hardware to sleep
+        const buffer = audioContext.createBuffer(1, 1, 22050);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = 0.0; // Complete silence
+        
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        source.start(0);
+      } catch (e) {
+        console.warn('[Audio] Keep-alive silent audio failed:', e);
+      }
+    }
+  }, 10000); // Every 10 seconds
+}
+
 // --- Audio Queue Playback (24kHz Raw PCM) ---
 function playPCMAudio(base64Data) {
   if (!audioContext) return;
+
+  resumeAudioContext(); // Active resume on chunk arrival
 
   const arrayBuffer = base64ToArrayBuffer(base64Data);
   const float32 = pcm16ToFloat32(arrayBuffer);
@@ -869,6 +952,19 @@ function commitPreviousTurn() {
   }
 }
 
+// Send clientContent turnComplete to Gemini WebSocket Proxy
+function sendTurnComplete() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const turnCompleteMessage = {
+    clientContent: {
+      turns: [],
+      turnComplete: true
+    }
+  };
+  console.log('[WebSocket] Sending clientContent turnComplete');
+  ws.send(JSON.stringify(turnCompleteMessage));
+}
+
 function startRecording(role) {
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     showToast('서버 연결이 끊어져 있어 재연결을 시도합니다. 잠시 후 다시 마이크를 켜주세요.', 'info');
@@ -876,16 +972,34 @@ function startRecording(role) {
     return;
   }
 
-  // Ensure AudioContext is running (in case browser paused it)
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume();
+  resumeAudioContext(); // Ensure AudioContext is active on user tap gesture
+
+  // If a stop timeout is pending for this role, clear it so we keep recording continuously
+  if (role === 'staff') {
+    if (staffStopTimeout) {
+      clearTimeout(staffStopTimeout);
+      staffStopTimeout = null;
+      console.log('[Audio] Staff startRecording called while stop timeout was pending. Timeout cleared.');
+      btnMicStaff.classList.add('recording');
+      btnMicStaff.querySelector('.mic-label').textContent = '말하는 중 (녹음 중)';
+      return; // Keep existing session active
+    }
+  } else {
+    if (customerStopTimeout) {
+      clearTimeout(customerStopTimeout);
+      customerStopTimeout = null;
+      console.log('[Audio] Customer startRecording called while stop timeout was pending. Timeout cleared.');
+      btnMicCustomer.classList.add('recording');
+      customerStatus.classList.add('speaking');
+      return; // Keep existing session active
+    }
   }
 
   // Commit previous turn's text
   commitPreviousTurn();
 
-  // Enforce mutual exclusion
-  stopRecording(role === 'staff' ? 'customer' : 'staff');
+  // Enforce mutual exclusion (stop other role immediately without delay)
+  stopRecordingImmediate(role === 'staff' ? 'customer' : 'staff');
 
   // Track the active speaker
   lastActiveSpeaker = role;
@@ -920,20 +1034,67 @@ function startRecording(role) {
   }
 }
 
-function stopRecording(role) {
+function stopRecordingImmediate(role) {
+  resumeAudioContext(); // Active resume on user gesture
+
   if (role === 'staff') {
+    if (staffStopTimeout) {
+      clearTimeout(staffStopTimeout);
+      staffStopTimeout = null;
+    }
     if (!isRecordingStaff) return;
     isRecordingStaff = false;
     btnMicStaff.classList.remove('recording');
     btnMicStaff.querySelector('.mic-label').textContent = isPTTMode ? '누르고 말하기' : '마이크 켜기';
   } else {
+    if (customerStopTimeout) {
+      clearTimeout(customerStopTimeout);
+      customerStopTimeout = null;
+    }
     if (!isRecordingCustomer) return;
     isRecordingCustomer = false;
     btnMicCustomer.classList.remove('recording');
     customerStatus.classList.remove('speaking');
-    
-    // Localize customer views back to ready state
     updateCustomerUILanguage();
+  }
+}
+
+function stopRecording(role) {
+  const DELAY_MS = 500; // 500ms delay to prevent cutting off speech trailing end
+  
+  resumeAudioContext(); // Ensure AudioContext is active on user release gesture
+
+  if (role === 'staff') {
+    if (!isRecordingStaff) return;
+    
+    // Instantly update UI for immediate feedback
+    btnMicStaff.classList.remove('recording');
+    btnMicStaff.querySelector('.mic-label').textContent = isPTTMode ? '누르고 말하기' : '마이크 켜기';
+    
+    if (staffStopTimeout) clearTimeout(staffStopTimeout);
+    
+    staffStopTimeout = setTimeout(() => {
+      isRecordingStaff = false;
+      staffStopTimeout = null;
+      console.log('[Audio] Staff recording stopped after delay.');
+      sendTurnComplete();
+    }, DELAY_MS);
+  } else {
+    if (!isRecordingCustomer) return;
+    
+    // Instantly update UI for immediate feedback
+    btnMicCustomer.classList.remove('recording');
+    customerStatus.classList.remove('speaking');
+    updateCustomerUILanguage();
+    
+    if (customerStopTimeout) clearTimeout(customerStopTimeout);
+    
+    customerStopTimeout = setTimeout(() => {
+      isRecordingCustomer = false;
+      customerStopTimeout = null;
+      console.log('[Audio] Customer recording stopped after delay.');
+      sendTurnComplete();
+    }, DELAY_MS);
   }
 }
 
@@ -1023,6 +1184,8 @@ btnStartApp.addEventListener('click', async () => {
     }
     
     welcomeOverlay.classList.add('hidden');
+    startAudioKeepAlive(); // Start periodic silent playback to prevent audio suspend
+    
     // Render 서버 wake-up 후 WebSocket 연결
     await wakeUpServer();
     connectWebSocket();
@@ -1031,16 +1194,7 @@ btnStartApp.addEventListener('click', async () => {
   }
 });
 
-// Settings Button Click
-btnSettings.addEventListener('click', () => {
-  const currentUrl = getBackendWsUrl();
-  const newUrl = prompt('백엔드 WebSocket 주소를 입력해 주세요:\n(예: ws://localhost:3020/ws 또는 wss://your-backend.onrender.com/ws)', currentUrl);
-  if (newUrl !== null && newUrl.trim() !== '') {
-    localStorage.setItem('BACKEND_WS_URL', newUrl.trim());
-    showToast('백엔드 설정이 변경되었습니다. 재연결을 위해 새로고침을 실행합니다.');
-    setTimeout(() => window.location.reload(), 1500);
-  }
-});
+
 
 // Dropdown Language Selection Change
 selectLanguage.addEventListener('change', (e) => {
@@ -1059,9 +1213,9 @@ selectLanguage.addEventListener('change', (e) => {
 toggleMicMode.addEventListener('change', (e) => {
   isPTTMode = e.target.checked;
   
-  // Reset recordings
-  stopRecording('staff');
-  stopRecording('customer');
+  // Reset recordings immediately when mode is toggled
+  stopRecordingImmediate('staff');
+  stopRecordingImmediate('customer');
 
   if (isPTTMode) {
     btnMicStaff.querySelector('.mic-label').textContent = '누르고 말하기';

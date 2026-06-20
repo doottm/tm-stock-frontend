@@ -782,6 +782,27 @@ input:checked + .slider:before {
    Media Queries & Responsiveness
    ========================================================================== */
 @media (max-width: 768px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto; /* Allow vertical scrolling on mobile */
+  }
+
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .customer-pane {
+    height: auto;
+    min-height: 35vh;
+  }
+
+  .staff-pane {
+    height: auto;
+    min-height: 65vh;
+  }
+
   .split-pane {
     padding: 1.2rem;
   }
