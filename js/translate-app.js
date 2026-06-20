@@ -144,6 +144,28 @@ const customerTranslations = {
     btnToggleOff: "Tắt mic",
     btnToggleOn: "Bật mic",
     btnListening: "Đang lắng nghe..."
+  },
+  ru: {
+    customerBadge: "Клиент",
+    statusReady: "Готов говорить",
+    statusSpeaking: "Говорит...",
+    placeholderTarget: "Ваш перевод появится здесь.",
+    placeholderSource: "(То, что вы говорите, появится здесь)",
+    btnPTT: "Удерживайте, чтобы говорить",
+    btnToggleOff: "Микр. выкл.",
+    btnToggleOn: "Микр. вкл.",
+    btnListening: "Слушаю..."
+  },
+  th: {
+    customerBadge: "ลูกค้า",
+    statusReady: "พร้อมพูด",
+    statusSpeaking: "กำลังพูด...",
+    placeholderTarget: "คำแปลของคุณจะปรากฏที่นี่",
+    placeholderSource: "(สิ่งที่คุณพูดจะปรากฏที่นี่)",
+    btnPTT: "กดเพื่อพูด",
+    btnToggleOff: "ปิดไมค์",
+    btnToggleOn: "เปิดไมค์",
+    btnListening: "กำลังฟัง..."
   }
 };
 
@@ -327,7 +349,9 @@ function speakText(text, langCode) {
         'zh-TW': 'zh-TW',
         'es': 'es-ES',
         'fr': 'fr-FR',
-        'vi': 'vi-VN'
+        'vi': 'vi-VN',
+        'ru': 'ru-RU',
+        'th': 'th-TH'
       };
       
       utterance.lang = langMap[langCode] || 'en-US';
@@ -558,9 +582,9 @@ function handleAudioSamples(channelData) {
   // Accumulate native samples
   rawAudioBuffer.push(...channelData);
 
-  // Buffer length equivalent to 100ms
+  // Buffer length equivalent to 250ms
   const actualSampleRate = audioContext.sampleRate;
-  const targetChunkSizeNative = Math.floor(actualSampleRate * 0.1);
+  const targetChunkSizeNative = Math.floor(actualSampleRate * 0.25);
 
   if (rawAudioBuffer.length >= targetChunkSizeNative) {
     // 1. Downsample from native rate to 16000Hz (required by Gemini Live API)
@@ -671,6 +695,25 @@ async function wakeUpServer() {
   }
 }
 
+let heartbeatInterval = null;
+
+function startHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      console.log('[WebSocket] Sending keep-alive heartbeat ping');
+      ws.send(JSON.stringify({ type: 'ping' }));
+    }
+  }, 20000); // 20 seconds
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
 function connectWebSocket() {
   const url = getBackendWsUrl();
   console.log(`[WebSocket] Connecting to: ${url}`);
@@ -690,6 +733,9 @@ function connectWebSocket() {
     
     // Update Customer UI Language initially
     updateCustomerUILanguage();
+    
+    // Start heartbeat keep-alive
+    startHeartbeat();
   };
 
   ws.onmessage = async (event) => {
@@ -701,6 +747,12 @@ function connectWebSocket() {
         rawData = event.data;
       }
       const response = JSON.parse(rawData);
+      
+      // Heartbeat pong check
+      if (response && response.type === 'pong') {
+        console.log('[WebSocket] Received keep-alive heartbeat pong');
+        return;
+      }
       
       // Client diagnostics
       if (response.serverContent) {
@@ -723,6 +775,7 @@ function connectWebSocket() {
 
   ws.onclose = (event) => {
     console.log(`[WebSocket] Connection closed. Code: ${event.code}`);
+    stopHeartbeat(); // Stop heartbeat keep-alive
     
     // 자동 재연결 (최대 5회, 간격 증가)
     if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
